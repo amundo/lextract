@@ -1,16 +1,20 @@
 $(function(){
 
-  function chunk(){ 
+  function chunk(pattern){ 
     var text = $.trim($('textarea#source').val());
-    var patternRE = new RegExp($('input#chunker').val());
-    return text.split(patternRE); 
+    if (pattern.length>0){
+      var re = new RegExp(pattern);
+    } else {
+      var re = new RegExp('\n\n');
+    }
+    return text.split(re); 
   }
 
   $('#source').load('entries.txt');
   //$('#outline').load('outline.txt');
 
   $('#chunk').click(function(){
-    var chunks = chunk();
+    var chunks = chunk($('#chunker').val());
     $.each(chunks, function(i, chunk){ 
       $('#lexicon').append($('<li/>', { id: 'entry' + i, text: chunk, 'class': 'hidden'  } ))
     });
@@ -20,7 +24,6 @@ $(function(){
   $('#match').click(function(){
 
     var pattern = $('#tomark').val();
-    var re = new RegExp(pattern);
     $('.highlight').removeClass('highlight' );
     $('.current').highlightRegex( pattern );
 
