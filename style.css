@@ -1,0 +1,24 @@
+textarea { 
+  width: 500px;  height: 400px; padding: 1em; 
+  float:left;
+
+}
+nav { overflow: hidden; display: block; height: 25px; border-bottom: 1px solid black; width: 100%; }
+ul#lexicon { 
+  width: 50%;
+  list-style-type: none;
+  float:right;
+}
+ul#lexicon li.hidden { 
+  display:none;
+}
+ul#lexicon li.current { 
+  background: #ffc;
+  padding: 1em;
+  border: 2px solid #aa6;
+  margin: 1em;
+  -moz-border-radius: 5px; 
+}
+.highlight, mark { 
+  background: #cfc;
+}

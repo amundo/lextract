@@ -1,0 +1,8 @@
+// load the source dictionary
+$('#source').load('dictionary.txt');
+
+// get the user's pattern for chunk delimiter
+
+// split into chunks
+
+var chunks = [];

@@ -1,0 +1,150 @@
+<h1>Tales of Dictionary Parsing</h1>
+
+<p>Let's make a pretty dictionary of Chinook Jargon, shall we?</p>
+
+<p>By "pretty" I mean "formatted in a pleasing way." I don't know anything about Chinkook Jargon. I just looked through <a href="http://archive.org">archive.org</a> until I found a dictionary that met the following criteria:</p>
+
+<ul>
+<li>bilingual</li>
+<li>available as plain text</li> 
+<li>out of copyright or under an agreeably open license (so we can share the final product)</li> 
+<li>marked up in a systematic and reasonably simple way</li> 
+<li>long enough to fill up several pages</li> 
+<li>not just a word list &emdash; I want definitions that are at least a few lines long</li> 
+<li>in a language that I happen to find interesting.</li>
+</ul>
+
+<p>After searching archive.org for "dictionary" I came across:</p>
+
+<p><a title="Dictionary of the Chinook Jargon, or, Trade Language of Oregon : Gibbs, George, 1815-1873 : Free Download &amp; Streaming : Internet Archive" href="http://www.archive.org/details/dictionaryofthec15672gut">Dictionary of the Chinook Jargon, or, Trade Language of Oregon : Gibbs, George, 1815-1873 : Free Download &amp; Streaming : Internet Archive</a></p>
+
+<p>I followed the "All files: HTTP" link to: <a title="Index of /0/items/dictionaryofthec15672gut/" href="http://ia301506.us.archive.org/0/items/dictionaryofthec15672gut/">Index of /0/items/dictionaryofthec15672gut/</a>, where 15672.txt contains the dictionary.</p>
+
+<p>So, Chinook Jargon happened to meet all of my criteria.</p>
+
+<h1>Parsing the text file</h1>
+
+<p>Guess what? This part is <em>always</em> a pain in the neck. Mainly because you generally end up having to use regular expressions.</p>
+
+<p>Regular expressions do not like human beings. But, aside from hand-editing the entire file, they're all we've got.</p>
+
+<p>I used Python. I started out by excerpting out the English-Chinook and Chinook-English sections of the file.</p>
+
+<p>Later we'll want to put back the Project Gutenberg license and the introductory material and all that, but for now I just went into a text editor and cut-and-pasted out two new files, <code>chi-en.txt</code> and <code>en-chi.txt</code>. For this project we'll just deal with the Chinook-English section, <code>en-chi.txt</code>.</p>
+
+<h2>"Chunk" the file into entries.</h2>
+
+<p>Here's a sample from the middle of the file that shows what it looks like:</p>
+
+<pre><code>
+~Kow~, _v._ Chinook, KAU-KAU. _To tie; to fasten._ Kow mika kiuatan, _tie
+your horse;_ ikt kow, _a bundle._
+
+~Kull~, _adj._ Chinook, K'HUL-K'HUL. _Hard in substance; difficult._
+Chahko kull, _to become hard;_ mamook kull, _to harden; to cause to become
+hard;_ hyas kull spose mamook, _it is very hard to do so;_ kull stick,
+_oak or any hard wood._
+
+~Kul-lagh'~, or ~Kul-lagh'-an~, _n._ Chihalis, KULLAKH; Lummi, KULLUKHAN.
+_A fence; a corral, or inclosure._ Kullagh stick, _fence rails._ In the
+original, it meant the stockade with which Indian houses are often
+surrounded.
+
+~Kum'-tuks~, or ~Kame-taks~, _v._ Nootka, KOMMETAK (Jewitt); Tokwaht,
+KUMITUKS; Clayoquot, KEMITAK. _To know; understand; be acquainted with;
+imagine; believe._ Mamook kumtuks, _to explain; teach;_ hyas kumtuks
+solleks (literally, _well to understand anger), to be passionate;_ kopet
+kumtuks, _to forget;_ halo kumtuks, _stupid; without understanding;_ (of a
+horse) hyas yakka kumtuks cooley, _he can run fast_ (literally, _he knows
+well to run_); kumtuks kliminawhit, _to be a liar; to understand lying;_
+nika kumtuks okook tyee, _I know that chief;_ nika kumtuks Klikatat
+wau-wau, _I understand the Klikatat language._
+
+~Kun'-a-moxt~, _adj._ Chinook, KONAWAY MOXT. _Both; together_ (literally,
+_all two_). Kunamoxt kahkwa, _both alike._
+
+</code></pre>
+
+<p>This dictionary is actually <em>really</em> structured compared to some of the stuff I've seen. A lot of times, you end up being handed some unstructured prose in a word processing file or something, where the syntactic categories are distinguish by being, like, <em>bold</em>. That's when you weep. With the current file, we just tear up a little.</p>
+
+<p>Arrite, what have we got here? Well, the first thing that stands out is that each entry seems to be a paragraph. So, what's the definition of a "paragraph"? It's something like "the text between blank lines." And do we explain what a "blank line" is to the machine? There are a bunch of ways, but we'll just resort immediately to regular expressions.</p> 
+
+<p>(This is an annotated version of a log of what I did in the interactive Python shell. It probably doesn't all make sense right off the bat, but see if you can get the general gist of what I'm trying to do.)</p>
+
+<pre><code>
+chi_en = open('chi-en.txt','U').read().decode('utf-8')
+# The "U" means "universal newlines"... which... just trust me. 
+# And the original file, as most reasonable files in this day in age, 
+# is utf-8.
+# We didn't get any errors, so it probably *is* utf-8.
+print chi_en
+# Hey look, it's a Chinook Jargon to English dictionary.
+# Are those entries really distinguished by a couple newlines?
+'\n\n' in chi_en
+# That said True which means "yes." 
+# Well, it looks like the file contains sequences of newlines. How many?
+chi_en.count('\n\n')
+# 500 and something. So this is probably in fact how the entries are delimited.
+# Gotta catch 'em all:
+chunks = chi_en.split('\n\n')
+# Let's take a peek at a few just to make sure we're in the ball park:
+from random import choice
+print choice(chunks)
+print choice(chunks)
+print choice(chunks)
+# Okay, they look alright. To make life easier, we're going to remove all the 
+# internal newlines in each chunk. We'll call these entries, since that's 
+# what they are
+entries = [chunk.replace('\n', ' ') for chunk in chunks]
+print choice(entries)
+# Yeah, now it's one long line. That's what we want.
+print choice(entries)
+# O hai.
+print choice(entries)
+# let's save this where we are & get outta Dodge.
+out = open('entries.txt','w')
+for entry in entries:
+ out.write(entry.encode('utf-8') + '\n')
+
+out.close()
+# bye.
+</code></pre>
+
+<p>So now we have a  file called <code>entries.txt</code> with one entry per line. So we can resume where we started by doing:</p>
+
+<pre><code>
+entries = open('entries.txt').read().decode('utf-8').splitlines()
+</code></pre>
+
+<h2>Chopping up an entry</h2>
+<p>Now what we're going to want to do is process each of those entries. This is what we're going to want to do, ultimately:</p>
+<pre><code>
+def parse_entry(entry):
+  # do some stuff that finds the headword and defition
+  # print them out in some HTML tags
+  return entry # ...as soon as we figure out how to do that  
+
+for entry in entries:
+  print parse_entry(entry)
+</code></pre>
+
+<h2>A philosophical aside. Or something.</h2>
+<p>You'll notice that I'm not doing the hard thing, which would be to put all this stuff into a real structured database. We will want to do that, but we're still trying to get familiar with just what how this lexicon is structured.  How could we create a database without knowing what the fields we want are?</p>
+
+<p>Nope, that would be premature. Instead, we'll just go through the entries, and print them out as HTML. Then, we can look at the results in a web browser, and throw a little CSS at it so it doesn't offend our eyeballs too much. And most importantly, we will see what's breaking.</p>
+
+<p>This process of "parse a little, render, read, review, repeat" is at the heart of digitizing stuff like this. It's slow, it's a pain, and as far as I know, there's no way around it, because legacy linguistics wasn't designed to be machine-readable. C'est la vie.</p>
+
+<p>So, let's see what we've got. How about this lovely entry:</p>
+
+
+<pre><code>
+~La-peep'~, _n._ French, LA PIPE. _A tobacco-pipe._ Lapeep kullakala (literally, the "pipe-bird"), _the band-tailed eagle,_ as its feathers were used to ornament the pipe stems.
+</code></pre>
+
+<p>The main structure here is: "headword (~La-peep~), part-of-speech, source-language, source-form, definition."
+
+
+<p> The <strong>headword</strong> seems to be wrapped in squiggles (tildes, if you're picky), so that's nice. Let's just build up our confidence by extracting the headwords into a list.</p>
+
+
