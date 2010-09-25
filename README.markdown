@@ -15,6 +15,14 @@ Case in point: suppose you have a text dictionary like this
 
 It's pretty structured; but we'd like to get it into a lexical database. 
 
-You can probably make some progress with regular expressions (ALLCAPS words in this text seem to all be Nootka etyma, _italicized_ stuff is a definition, etc. But it's inevitable that eventually you're going to have to go through the document by hand and edit the content.  
+You can probably make some progress with regular expressions as this text is semi-structured. To wit:
+
+* ALLCAPS words in this text seem to all be Nootka etyma
+* _italicized_ stuff is a definition
+* ~tilde'd~ words are headwords
+
+...and so on.
+
+But it's inevitable that eventually you're going to have to go through the document by hand and edit the content.  
 
 That's where this tool comes in: it helps you to write, run, and test regular expression matching patterns on "chunks" (in this case entries), and thus semi-automatically start to fill out the database from the raw text.
