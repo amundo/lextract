@@ -1,6 +1,6 @@
 It's a common situation to want to semi-automatically extract text from a semi-structured document into a database.
 
-Case in point: suppose you have a text dictionary like this 
+Case in point: suppose you have a text dictionary like George Gibb's <a title="Dictionary of the Chinook Jargon, or, Trade Language of Oregon : Gibbs, George, 1815-1873 : Free Download & Streaming : Internet Archive" href="http://www.archive.org/details/dictionaryofthec15672gut">Dictionary of the Chinook Jargon, or, Trade Language of Oregon</a>:
 
 
 > ~Chil-chil~. See TSIL-TSIL.
