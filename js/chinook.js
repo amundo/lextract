@@ -15,6 +15,7 @@ $(function(){
 
   $('#chunk').click(function(){
     var chunks = chunk($('#chunker').val());
+    localStorage['original'] = JSON.stringify(chunks);
     $.each(chunks, function(i, chunk){ 
       $('#lexicon').append($('<li/>', { id: 'entry' + i, text: chunk, 'class': 'hidden'  } ))
     });
